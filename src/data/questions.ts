@@ -1,13 +1,14 @@
 export interface QuestRes {
-  response_code: number;
-  results: Result[];
+  response_code?: number;
+  results?: Result[];
 }
 
 export interface Result {
-  type: string;
-  difficulty: string;
+  type?: string;
+  difficulty?: string;
   category: string;
   question: string;
   correct_answer: string;
   incorrect_answers: string[];
+  options: string[];
 }
