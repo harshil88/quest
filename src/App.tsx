@@ -1,5 +1,6 @@
-import NavComponent from "./components/nav-component";
 import { ThemeProvider } from "./components/theme-provider";
+import { FunctionalAnswerUpdater } from "./dummyC";
+import { QuestProvider } from "./question-store";
 
 function App() {
   Array.prototype.options = function (correct: string): string[] {
@@ -10,9 +11,11 @@ function App() {
   };
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <NavComponent />
-    </ThemeProvider>
+    <QuestProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <FunctionalAnswerUpdater />
+      </ThemeProvider>
+    </QuestProvider>
   );
 }
 
