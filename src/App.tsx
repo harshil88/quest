@@ -1,5 +1,5 @@
+import NavComponent from "./components/nav-component";
 import { ThemeProvider } from "./components/theme-provider";
-import { FunctionalAnswerUpdater } from "./dummyC";
 import { QuestProvider } from "./question-store";
 
 function App() {
@@ -11,9 +11,9 @@ function App() {
   };
 
   return (
-    <QuestProvider>
+    <QuestProvider selectedCategory="someDummyCategory">
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <FunctionalAnswerUpdater />
+        <NavComponent />
       </ThemeProvider>
     </QuestProvider>
   );

@@ -1,33 +1,38 @@
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  FC,
-  useState,
-} from "react";
+import { createContext, useContext, ReactNode, FC, useState } from "react";
 
 interface Answer {
+  question: string;
   correctAnswer: string;
   selectedAnswer: string;
   correct: boolean;
 }
 
 interface QuestContextValue {
+  selectedCategory: string;
   answers: Answer[];
-  submitAnswer: (selected: string, correct: string) => void;
+  submitAnswer: (selected: string, correct: string, question: string) => void;
 }
 
 const questContext = createContext<QuestContextValue | undefined>(undefined);
 
 interface QuestProviderProps {
+  selectedCategory: string;
   children: ReactNode;
 }
 
-export const QuestProvider: FC<QuestProviderProps> = ({ children }) => {
+export const QuestProvider: FC<QuestProviderProps> = ({
+  children,
+  selectedCategory,
+}) => {
   const [answers, setAnswers] = useState<Answer[]>([]);
 
-  const submitAnswer = (selected: string, correct: string) => {
+  const submitAnswer = (
+    selected: string,
+    correct: string,
+    question: string
+  ) => {
     const newAnswer: Answer = {
+      question: question,
       selectedAnswer: selected,
       correctAnswer: correct,
       correct: correct == selected,
@@ -38,7 +43,9 @@ export const QuestProvider: FC<QuestProviderProps> = ({ children }) => {
   const questContextValue: QuestContextValue = {
     answers,
     submitAnswer,
+    selectedCategory,
   };
+
   return (
     <questContext.Provider value={questContextValue}>
       {children}

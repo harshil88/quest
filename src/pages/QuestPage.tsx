@@ -1,10 +1,12 @@
 import { Result } from "@/data/questions";
 import { QuestRes } from "@/data/questions";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useAnswers } from "@/question-store";
+import { useNavigate } from "react-router-dom";
 
 function QuestPage() {
   const [question, setQuestion] = useState<QuestRes>();
@@ -21,40 +23,21 @@ function QuestPage() {
   return QuestionCarouselComponent(question?.results);
 }
 
-interface Answer {
-  questionNo: number;
-  correctAnswer: string;
-  selectedAnswer: string;
-  correct: boolean;
-}
-
 function QuestionCarouselComponent(results?: Result[]) {
-  const [answer, setAnswer] = useState<Answer[]>();
+  const { answers, submitAnswer, selectedCategory } = useAnswers();
+  const [questionNo, setQuestionNo] = useState<number>(0);
+  const navigate = useNavigate();
 
-  function handleSubmit(selectedAnswer: string) {
-    if (answer == null) {
-      const firstAnswer: Answer = {
-        questionNo: 0,
-        correctAnswer:
-          results && results[0].correct_answer ? results[0].correct_answer : "",
-        selectedAnswer: selectedAnswer,
-        correct:
-          results && results[0].correct_answer
-            ? results[0].correct_answer == selectedAnswer
-            : false,
-      };
-      setAnswer([firstAnswer]);
-    } else {
-      const newAnswer: Answer = {
-        questionNo: answer.length + 1,
-        correctAnswer: "",
-        selectedAnswer: selectedAnswer,
-        correct:
-          results && results[answer.length + 1].correct_answer
-            ? results[answer.length + 1].correct_answer == selectedAnswer
-            : false,
-      };
-      setAnswer([...answer, newAnswer]);
+  console.log(selectedCategory.toString());
+
+  function handleSubmit(selected: string) {
+    const correct = (results && results[questionNo].correct_answer) ?? "";
+    const question = (results && results[questionNo].question) ?? "";
+
+    submitAnswer(selected, correct, question);
+    setQuestionNo(questionNo + 1);
+    if (questionNo == 2) {
+      navigate("/result");
     }
   }
 
@@ -63,22 +46,21 @@ function QuestionCarouselComponent(results?: Result[]) {
       <h1 className="text-4xl text-center my-6 font-extrabold tracking-tight">
         Category Name
       </h1>
-      <h4>Current Question 2 / 10</h4>
+      <h4>Current Question {questionNo} / 10</h4>
 
       <Progress value={80} className="my-5" />
 
       <QuestionItem
-        result={results && results[answer?.length ?? 0]}
-        key={answer?.length ?? 0}
+        result={results && results[questionNo]}
         options={
-          results && results[answer?.length ?? 0].incorrect_answers
-            ? results[answer?.length ?? 0].incorrect_answers!.options(
-                results[answer?.length ?? 0].correct_answer ?? ""
+          results && results[questionNo].incorrect_answers
+            ? results[questionNo].incorrect_answers!.options(
+                results[questionNo].correct_answer ?? ""
               )
             : []
         }
-        handleSubmit={(selectedAnswer) => {
-          handleSubmit(selectedAnswer);
+        handleSubmit={(selected) => {
+          handleSubmit(selected);
         }}
       />
     </div>
@@ -87,7 +69,6 @@ function QuestionCarouselComponent(results?: Result[]) {
 
 interface QuestionItemProps {
   result?: Result;
-  key: number;
   options: string[];
   handleSubmit: (answer: string) => void;
 }
